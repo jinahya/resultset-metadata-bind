@@ -15,11 +15,88 @@
  */
 package com.github.jinahya.sql.resultset.metadata.bind;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
+ * A class binds informations from {@link ResultSetMetaData}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
+@XmlRootElement
 public class ResultSetColumn {
+
+    public static ResultSetColumn bind(final ResultSetMetaData metadata,
+                                       final int column)
+            throws SQLException {
+        return new ResultSetColumn()
+                .catalogName(metadata.getCatalogName(column))
+                .columnClassName(metadata.getColumnClassName(column))
+                .columnDisplaySize(metadata.getColumnDisplaySize(column))
+                .columnLabel(metadata.getColumnLabel(column))
+                .columnName(metadata.getColumnName(column))
+                .columnType(metadata.getColumnType(column))
+                .columnTypeName(metadata.getColumnTypeName(column))
+                .precision(metadata.getPrecision(column))
+                .scale(metadata.getScale(column))
+                .schemaName(metadata.getSchemaName(column))
+                .tableName(metadata.getTableName(column))
+                .autoIncrement(metadata.isAutoIncrement(column))
+                .caseSensitive(metadata.isCaseSensitive(column))
+                .currency(metadata.isCurrency(column))
+                .definitelyWritable(metadata.isDefinitelyWritable(column))
+                .nullable(metadata.isNullable(column))
+                .readOnly(metadata.isReadOnly(column))
+                .searchable(metadata.isSearchable(column))
+                .signed(metadata.isSigned(column))
+                .writable(metadata.isWritable(column));
+    }
+
+    public static List<ResultSetColumn> bind(final ResultSetMetaData metadata)
+            throws SQLException {
+        final int columnCount = metadata.getColumnCount();
+        final List<ResultSetColumn> bound
+                = new ArrayList<ResultSetColumn>(columnCount);
+        for (int i = 1; i <= columnCount; i++) {
+            bound.add(bind(metadata, i));
+        }
+        return bound;
+    }
+
+    public static List<ResultSetColumn> bind(final ResultSet results)
+            throws SQLException {
+        return bind(results.getMetaData());
+    }
+
+    @Override
+    public String toString() {
+        return super.toString()
+               + "?catalogName=" + catalogName
+               + "&columnClassName=" + columnClassName
+               + "&columnDisplaySize=" + columnDisplaySize
+               + "&columnLabel=" + columnLabel
+               + "&columnName=" + columnName
+               + "&columnType=" + columnType
+               + "&columnTypeName=" + columnTypeName
+               + "&precision=" + precision
+               + "&scale=" + scale
+               + "&schemaName=" + schemaName
+               + "&tableName=" + tableName
+               + "&autoIncrement=" + autoIncrement
+               + "&caseSensigive=" + caseSensitive
+               + "&currency=" + currency
+               + "&definetelyWritable=" + definitelyWritable
+               + "&nullable=" + nullable
+               + "&readOnly=" + readOnly
+               + "&searchable=" + searchable
+               + "&signed=" + signed
+               + "&writable=" + writable;
+    }
 
     // ------------------------------------------------------------- catalogName
     public String getCatalogName() {
@@ -383,43 +460,63 @@ public class ResultSetColumn {
     }
 
     // -------------------------------------------------------------------------
+    @XmlElement(required = true)
     private String catalogName;
 
+    @XmlElement(required = true)
     private String columnClassName;
 
+    @XmlElement(required = true)
     private int columnDisplaySize;
 
+    @XmlElement(required = true)
     private String columnLabel;
 
+    @XmlElement(required = true)
     private String columnName;
 
+    @XmlElement(required = true)
     private int columnType;
 
+    @XmlElement(required = true)
     private String columnTypeName;
 
+    @XmlElement(required = true)
     private int precision;
 
+    @XmlElement(required = true)
     private int scale;
 
+    @XmlElement(required = true)
     private String schemaName;
 
+    @XmlElement(required = true)
     private String tableName;
 
+    @XmlElement(required = true)
     private boolean autoIncrement;
 
+    @XmlElement(required = true)
     private boolean caseSensitive;
 
+    @XmlElement(required = true)
     private boolean currency;
 
+    @XmlElement(required = true)
     private boolean definitelyWritable;
 
+    @XmlElement(required = true)
     private int nullable;
 
+    @XmlElement(required = true)
     private boolean readOnly;
 
+    @XmlElement(required = true)
     private boolean searchable;
 
+    @XmlElement(required = true)
     private boolean signed;
 
+    @XmlElement(required = true)
     private boolean writable;
 }

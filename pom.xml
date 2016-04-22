@@ -40,21 +40,8 @@
     <maven.compiler.testTarget>1.8</maven.compiler.testTarget>
   </properties>
 
-  <repositories>
-    <repository>
-      <!-- mariaDB4j -->
-      <id>bintray-vorburger</id>
-      <url>https://dl.bintray.com/vorburger/maven/</url>
-    </repository>
-  </repositories>
-
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>ch.vorburger.mariaDB4j</groupId>
-        <artifactId>mariaDB4j</artifactId>
-        <version>2.1.3</version>
-      </dependency>
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
@@ -166,75 +153,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.3</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <!--<goal>shade</goal>-->
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <relocations>
-                <relocation>
-                  <pattern>org.apache.commons.lang3</pattern>
-                  <shadedPattern>com.github.jinahya.sql.metadata.bind.realocated.lang3</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>2.0.11</version>
-        <executions>
-          <execution>
-            <id>proguard</id>
-            <phase>package</phase>
-            <goals>
-              <!--<goal>proguard</goal>-->
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <addMavenDescriptor>true</addMavenDescriptor>
-          <includeDependency>flase</includeDependency>
-          <options>
-            <option>
-              -dontobfuscate
-              -dontoptimize
-              -keepattributes *Annotation*
-              -keepattributes Signature
-              -keepattributes InnerClasses
-              -keep class com.github.jinahya.sql.database.metadata.bind.* { *; }
-            </option>
-          </options>
-          <libs>
-            <lib>${java.bootstrap.classes}</lib>
-            <lib>${java.cryptographic.extension.classes}</lib>
-            <lib>${java.secure.socket.extension.classes}</lib>
-          </libs>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>5.2.1</version>
-            <scope>runtime</scope>
-          </dependency>
-          <!--          <dependency>
-            <groupId>net.sourceforge.cobertura</groupId>
-            <artifactId>cobertura</artifactId>
-            <version>2.1.1</version>
-            <scope>runtime</scope>
-          </dependency>-->
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.19.1</version>
         <configuration>
@@ -252,7 +170,7 @@
         <version>1.15</version>
         <executions>
           <execution>
-            <id>check-against-java17</id>
+            <id>check-against-java16</id>
             <phase>test</phase>
             <goals>
               <goal>check</goal>
@@ -260,7 +178,7 @@
             <configuration>
               <signature>
                 <groupId>org.codehaus.mojo.signature</groupId>
-                <artifactId>java17</artifactId>
+                <artifactId>java16</artifactId>
                 <version>1.0</version>
               </signature>
             </configuration>
@@ -300,11 +218,6 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
         <version>3.0.3</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javancss-maven-plugin</artifactId>
-        <version>2.1</version>
       </plugin>
     </plugins>
   </reporting>
@@ -347,51 +260,6 @@
                 <configuration>
                   <sources>
                     <source>src/test/java-postgresql-embedded</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>mariaDB4j</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.mariadb.jdbc</groupId>
-          <artifactId>mariadb-java-client</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>ch.vorburger.mariaDB4j</groupId>
-          <artifactId>mariaDB4j</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/PostgreSQL*Test</include>
-              </includes>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-mariaDB4j</source>
                   </sources>
                 </configuration>
               </execution>

@@ -15,31 +15,10 @@
  */
 package com.github.jinahya.sql.resultset.metadata.bind;
 
-import java.sql.ResultSetMetaData;
-
 /**
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public enum ColumnNullable {
+public class ResultSetColumnTest {
 
-    columnNoNulls(ResultSetMetaData.columnNoNulls),
-    columnNullable(ResultSetMetaData.columnNullable),
-    columnNullableUnknown(ResultSetMetaData.columnNullableUnknown);
-
-    public static ColumnNullable valueOf(final int fieldValue) {
-        for (final ColumnNullable value : values()) {
-            if (value.fieldValue == fieldValue) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException(
-                "no constant for field value: " + fieldValue);
-    }
-
-    private ColumnNullable(final int fieldValue) {
-        this.fieldValue = fieldValue;
-    }
-
-    private final int fieldValue;
 }
