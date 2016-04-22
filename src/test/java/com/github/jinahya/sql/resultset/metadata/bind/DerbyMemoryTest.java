@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.resultset.metadata.bind;
+package com.github.jinahya.sql.resultset.metadata.bind;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -27,7 +27,6 @@ import java.sql.ResultSet;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import static org.slf4j.LoggerFactory.getLogger;
-import static java.sql.DriverManager.getConnection;
 import static java.sql.DriverManager.getConnection;
 
 /**
