@@ -577,7 +577,7 @@ public class ResultSetMetaDataColumn {
      * Returns the value of {@code nullable}
      *
      * @return the value of {@code nullable}.
-     * @see ResultSetMetaData#get#isNullable(int)
+     * @see ResultSetMetaData#isNullable(int) 
      */
     public int getNullable() {
         return nullable;
