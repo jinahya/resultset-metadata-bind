@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.sql.resultset.metadata.bind;
+package com.github.jinahya.sql;
 
+import com.github.jinahya.sql.ResultSetMetaDataColumn;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -27,6 +28,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import static org.slf4j.LoggerFactory.getLogger;
+import static java.sql.DriverManager.getConnection;
 import static java.sql.DriverManager.getConnection;
 
 /**
@@ -46,27 +48,37 @@ public class DerbyMemoryTest {
     private static void beforeClass() throws SQLException {
         final Properties properties = new Properties();
         properties.put("create", "true");
-        final Connection connection = getConnection(CONNECTION_URL, properties);
-        try {
-        } finally {
-            connection.close();
+        try (Connection connection
+                = getConnection(CONNECTION_URL, properties)) {
         }
     }
 
     @AfterClass
-    private static void afterClass() throws SQLException {
+    private static void afterClass() {
         final Properties properties = new Properties();
         properties.put("shutdown", "true");
         try {
-            final Connection connection
-                    = getConnection(CONNECTION_URL, properties);
-            try {
-            } finally {
-                connection.close();
+            try (Connection connection
+                    = getConnection(CONNECTION_URL, properties)) {
             }
         } catch (final SQLException sqle) {
             // this is expected
             // Shutdown commands always raise SQLExceptions.
+        }
+    }
+
+    @Test
+    public void catalogs() throws SQLException, JAXBException {
+        try (Connection connection = getConnection(CONNECTION_URL)) {
+            final DatabaseMetaData database = connection.getMetaData();
+            try (ResultSet results = database.getCatalogs()) {
+                final List<ResultSetMetaDataColumn> columns
+                        = ResultSetMetaDataColumn.bind(results);
+                for (final ResultSetMetaDataColumn column : columns) {
+                    logger.debug("DatabaseMetaData.catalog: {}", column);
+                    JaxbTest.marshalInstance(column);
+                }
+            }
         }
     }
 
@@ -76,10 +88,10 @@ public class DerbyMemoryTest {
             final DatabaseMetaData database = connection.getMetaData();
             try (ResultSet results
                     = database.getTables(null, null, null, null)) {
-                final List<ResultSetColumn> columns
-                        = ResultSetColumn.bind(results);
-                for (final ResultSetColumn column : columns) {
-                    logger.debug("DatabaseMetaData.column: {}", column);
+                final List<ResultSetMetaDataColumn> columns
+                        = ResultSetMetaDataColumn.bind(results);
+                for (final ResultSetMetaDataColumn column : columns) {
+                    logger.debug("DatabaseMetaData.table: {}", column);
                     JaxbTest.marshalInstance(column);
                 }
             }

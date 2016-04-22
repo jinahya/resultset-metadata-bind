@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jin Kwon &lt;onacit_at_gmail.com&gt;.
+ * Copyright 2013 <a href="mailto:onacit@gmail.com">Jin Kwon</a>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.sql.resultset.metadata.bind;
+package com.github.jinahya.sql;
 
 /**
+ * Constants for XML binding.
  *
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
-public class ResultSetColumnTest {
+public final class XmlConstants {
 
+    /**
+     * The Namespace URI for resultset-metadata.
+     */
+    public static final String RESULTSET_METADATA_NS_URI
+            = "http://github.com/jinahya/sql";
+
+    static final String RESULTSET_MEATDATA_NS_PREFIX = "r";
+
+    private XmlConstants() {
+        super();
+    }
 }

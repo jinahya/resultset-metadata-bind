@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.sql.resultset.metadata.bind;
+package com.github.jinahya.sql;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -24,12 +24,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * A class binds informations from {@link ResultSetMetaData}.
+ * A class binds column information from {@link ResultSetMetaData}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @XmlRootElement
-public class ResultSetColumn {
+public class ResultSetMetaDataColumn {
 
     /**
      * Binds a column information from specified ResultSetMetaData.
@@ -39,10 +39,10 @@ public class ResultSetColumn {
      * @return a bound column information
      * @throws SQLException if a database access error occurs.
      */
-    public static ResultSetColumn bind(final ResultSetMetaData metadata,
-                                       final int column)
+    public static ResultSetMetaDataColumn bind(final ResultSetMetaData metadata,
+                                               final int column)
             throws SQLException {
-        return new ResultSetColumn()
+        return new ResultSetMetaDataColumn()
                 .catalogName(metadata.getCatalogName(column))
                 .columnClassName(metadata.getColumnClassName(column))
                 .columnDisplaySize(metadata.getColumnDisplaySize(column))
@@ -72,11 +72,12 @@ public class ResultSetColumn {
      * @return a list of bound column formation.
      * @throws SQLException if a database access error occurs.
      */
-    public static List<ResultSetColumn> bind(final ResultSetMetaData metadata)
+    public static List<ResultSetMetaDataColumn> bind(
+            final ResultSetMetaData metadata)
             throws SQLException {
         final int columnCount = metadata.getColumnCount();
-        final List<ResultSetColumn> bound
-                = new ArrayList<ResultSetColumn>(columnCount);
+        final List<ResultSetMetaDataColumn> bound
+                = new ArrayList<ResultSetMetaDataColumn>(columnCount);
         for (int i = 1; i <= columnCount; i++) {
             bound.add(bind(metadata, i));
         }
@@ -90,7 +91,7 @@ public class ResultSetColumn {
      * @return a list of bound column information
      * @throws SQLException if a database access error occurs.
      */
-    public static List<ResultSetColumn> bind(final ResultSet results)
+    public static List<ResultSetMetaDataColumn> bind(final ResultSet results)
             throws SQLException {
         return bind(results.getMetaData());
     }
@@ -145,7 +146,7 @@ public class ResultSetColumn {
         return getCatalogName();
     }
 
-    public ResultSetColumn catalogName(final String catalogName) {
+    public ResultSetMetaDataColumn catalogName(final String catalogName) {
         setCatalogName(catalogName);
         return this;
     }
@@ -175,7 +176,7 @@ public class ResultSetColumn {
         return getColumnClassName();
     }
 
-    public ResultSetColumn columnClassName(final String columnClassName) {
+    public ResultSetMetaDataColumn columnClassName(final String columnClassName) {
         setColumnClassName(columnClassName);
         return this;
     }
@@ -205,7 +206,7 @@ public class ResultSetColumn {
         return getColumnDisplaySize();
     }
 
-    public ResultSetColumn columnDisplaySize(final int columnDisplaySize) {
+    public ResultSetMetaDataColumn columnDisplaySize(final int columnDisplaySize) {
         setColumnDisplaySize(columnDisplaySize);
         return this;
     }
@@ -235,7 +236,7 @@ public class ResultSetColumn {
         return getColumnLabel();
     }
 
-    public ResultSetColumn columnLabel(final String columnLabel) {
+    public ResultSetMetaDataColumn columnLabel(final String columnLabel) {
         setColumnLabel(columnLabel);
         return this;
     }
@@ -265,7 +266,7 @@ public class ResultSetColumn {
         return getColumnName();
     }
 
-    public ResultSetColumn columnName(final String columnName) {
+    public ResultSetMetaDataColumn columnName(final String columnName) {
         setColumnName(columnName);
         return this;
     }
@@ -295,7 +296,7 @@ public class ResultSetColumn {
         return getColumnType();
     }
 
-    public ResultSetColumn columnType(final int columnType) {
+    public ResultSetMetaDataColumn columnType(final int columnType) {
         setColumnType(columnType);
         return this;
     }
@@ -325,7 +326,7 @@ public class ResultSetColumn {
         return getColumnTypeName();
     }
 
-    public ResultSetColumn columnTypeName(final String columnTypeName) {
+    public ResultSetMetaDataColumn columnTypeName(final String columnTypeName) {
         setColumnTypeName(columnTypeName);
         return this;
     }
@@ -355,7 +356,7 @@ public class ResultSetColumn {
         return getPrecision();
     }
 
-    public ResultSetColumn precision(final int precision) {
+    public ResultSetMetaDataColumn precision(final int precision) {
         setPrecision(precision);
         return this;
     }
@@ -385,7 +386,7 @@ public class ResultSetColumn {
         return getScale();
     }
 
-    public ResultSetColumn scale(final int scale) {
+    public ResultSetMetaDataColumn scale(final int scale) {
         setScale(scale);
         return this;
     }
@@ -415,7 +416,7 @@ public class ResultSetColumn {
         return getSchemaName();
     }
 
-    public ResultSetColumn schemaName(final String schemaName) {
+    public ResultSetMetaDataColumn schemaName(final String schemaName) {
         setSchemaName(schemaName);
         return this;
     }
@@ -445,7 +446,7 @@ public class ResultSetColumn {
         return getTableName();
     }
 
-    public ResultSetColumn tableName(final String tableName) {
+    public ResultSetMetaDataColumn tableName(final String tableName) {
         setTableName(tableName);
         return this;
     }
@@ -475,7 +476,7 @@ public class ResultSetColumn {
         return isAutoIncrement();
     }
 
-    public ResultSetColumn autoIncrement(final boolean autoIncrement) {
+    public ResultSetMetaDataColumn autoIncrement(final boolean autoIncrement) {
         setAutoIncrement(autoIncrement);
         return this;
     }
@@ -505,7 +506,7 @@ public class ResultSetColumn {
         return isCaseSensitive();
     }
 
-    public ResultSetColumn caseSensitive(final boolean caseSensitive) {
+    public ResultSetMetaDataColumn caseSensitive(final boolean caseSensitive) {
         setCaseSensitive(caseSensitive);
         return this;
     }
@@ -515,7 +516,7 @@ public class ResultSetColumn {
      * Returns the value of {@code currency} field.
      *
      * @return the value of {@code currency} field.
-     * @see ResultSetMetaData#isCurrency(int) 
+     * @see ResultSetMetaData#isCurrency(int)
      */
     public boolean isCurrency() {
         return currency;
@@ -525,7 +526,7 @@ public class ResultSetColumn {
      * Replaces the value of {@code currency} field with given.
      *
      * @param currency new value for {@code currency} field.
-     * @see ResultSetMetaData#isCurrency(int) 
+     * @see ResultSetMetaData#isCurrency(int)
      */
     public void setCurrency(final boolean currency) {
         this.currency = currency;
@@ -535,7 +536,7 @@ public class ResultSetColumn {
         return isCurrency();
     }
 
-    public ResultSetColumn currency(final boolean currency) {
+    public ResultSetMetaDataColumn currency(final boolean currency) {
         setCurrency(currency);
         return this;
     }
@@ -565,7 +566,7 @@ public class ResultSetColumn {
         return isDefinitelyWritable();
     }
 
-    public ResultSetColumn definitelyWritable(
+    public ResultSetMetaDataColumn definitelyWritable(
             final boolean definitelyWritable) {
         setDefinitelyWritable(definitelyWritable);
         return this;
@@ -596,7 +597,7 @@ public class ResultSetColumn {
         return getNullable();
     }
 
-    public ResultSetColumn nullable(final int nullable) {
+    public ResultSetMetaDataColumn nullable(final int nullable) {
         setNullable(nullable);
         return this;
     }
@@ -626,7 +627,7 @@ public class ResultSetColumn {
         return isReadOnly();
     }
 
-    public ResultSetColumn readOnly(final boolean readOnly) {
+    public ResultSetMetaDataColumn readOnly(final boolean readOnly) {
         setReadOnly(readOnly);
         return this;
     }
@@ -656,7 +657,7 @@ public class ResultSetColumn {
         return isSearchable();
     }
 
-    public ResultSetColumn searchable(final boolean searchable) {
+    public ResultSetMetaDataColumn searchable(final boolean searchable) {
         setSearchable(searchable);
         return this;
     }
@@ -686,7 +687,7 @@ public class ResultSetColumn {
         return isSigned();
     }
 
-    public ResultSetColumn signed(final boolean signed) {
+    public ResultSetMetaDataColumn signed(final boolean signed) {
         setSigned(signed);
         return this;
     }
@@ -716,7 +717,7 @@ public class ResultSetColumn {
         return isWritable();
     }
 
-    public ResultSetColumn writable(final boolean writable) {
+    public ResultSetMetaDataColumn writable(final boolean writable) {
         setWritable(writable);
         return this;
     }
