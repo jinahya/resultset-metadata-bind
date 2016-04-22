@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.sql;
+package com.github.jinahya.resultset.metadata.bind;
 
-import com.github.jinahya.sql.ResultSetMetaDataColumn;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;

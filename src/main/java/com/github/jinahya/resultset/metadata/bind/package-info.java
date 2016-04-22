@@ -21,7 +21,7 @@
                       namespaceURI = XmlConstants.RESULTSET_METADATA_NS_URI)
            })
 @XmlAccessorType(XmlAccessType.NONE)
-package com.github.jinahya.sql;
+package com.github.jinahya.resultset.metadata.bind;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.annotation.XmlAccessType;

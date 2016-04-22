@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jinahya.sql;
+package com.github.jinahya.resultset.metadata.bind;
 
 /**
  * Constants for XML binding.
@@ -26,7 +26,7 @@ public final class XmlConstants {
      * The Namespace URI for resultset-metadata.
      */
     public static final String RESULTSET_METADATA_NS_URI
-            = "http://github.com/jinahya/sql";
+            = "http://github.com/jinahya/resultset/metadata/bind";
 
     static final String RESULTSET_MEATDATA_NS_PREFIX = "r";
 
