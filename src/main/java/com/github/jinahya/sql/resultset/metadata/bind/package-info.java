@@ -18,9 +18,7 @@
            namespace = XmlConstants.RESULTSET_METADATA_NS_URI,
            xmlns = {
                @XmlNs(prefix = XMLConstants.DEFAULT_NS_PREFIX,
-                      namespaceURI = XmlConstants.RESULTSET_METADATA_NS_URI),
-               @XmlNs(prefix = "xsi",
-                      namespaceURI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)
+                      namespaceURI = XmlConstants.RESULTSET_METADATA_NS_URI)
            })
 @XmlAccessorType(XmlAccessType.NONE)
 package com.github.jinahya.sql.resultset.metadata.bind;

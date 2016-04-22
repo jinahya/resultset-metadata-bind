@@ -19,6 +19,6 @@ package com.github.jinahya.sql.resultset.metadata.bind;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public class ResultSetColumnTest {
+public class ResultSetMetaDataColumnTest {
 
 }

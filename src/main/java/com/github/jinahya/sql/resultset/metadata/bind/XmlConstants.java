@@ -16,13 +16,17 @@
 package com.github.jinahya.sql.resultset.metadata.bind;
 
 /**
+ * Constants for XML binding.
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
 public final class XmlConstants {
 
+    /**
+     * The Namespace URI for resultset-metadata.
+     */
     public static final String RESULTSET_METADATA_NS_URI
-            = "http://github.com/jinahya/sql/resultset/metadata/bind";
+            = "http://github.com/jinahya/resultset/metadata/bind";
 
     static final String RESULTSET_MEATDATA_NS_PREFIX = "r";
 
