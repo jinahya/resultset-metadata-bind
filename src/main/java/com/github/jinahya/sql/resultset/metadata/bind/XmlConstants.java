@@ -23,7 +23,7 @@ package com.github.jinahya.sql.resultset.metadata.bind;
 public final class XmlConstants {
 
     /**
-     * The Namespace URI for resultset-metadata.
+     * The XML namespace URI for resultset-metadata-bind.
      */
     public static final String RESULTSET_METADATA_NS_URI
             = "http://github.com/jinahya/resultset/metadata/bind";
