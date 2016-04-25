@@ -176,7 +176,8 @@ public class ResultSetMetaDataColumn {
         return getColumnClassName();
     }
 
-    public ResultSetMetaDataColumn columnClassName(final String columnClassName) {
+    public ResultSetMetaDataColumn columnClassName(
+            final String columnClassName) {
         setColumnClassName(columnClassName);
         return this;
     }
@@ -206,7 +207,8 @@ public class ResultSetMetaDataColumn {
         return getColumnDisplaySize();
     }
 
-    public ResultSetMetaDataColumn columnDisplaySize(final int columnDisplaySize) {
+    public ResultSetMetaDataColumn columnDisplaySize(
+            final int columnDisplaySize) {
         setColumnDisplaySize(columnDisplaySize);
         return this;
     }
