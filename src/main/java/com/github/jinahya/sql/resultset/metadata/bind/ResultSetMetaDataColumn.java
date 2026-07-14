@@ -15,16 +15,38 @@
  */
 package com.github.jinahya.sql.resultset.metadata.bind;
 
+/*-
+ * #%L
+ * resultset-metadata-bind
+ * %%
+ * Copyright (C) 2016 - 2026 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.function.Consumer;
 
 /**
- * A class binds column information from {@link ResultSetMetaData}.
+ * Represents metadata for a single column described by {@link ResultSetMetaData}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -32,96 +54,130 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ResultSetMetaDataColumn {
 
     /**
-     * Binds a column information from specified ResultSetMetaData.
+     * Binds the specified column from the supplied result-set metadata.
      *
-     * @param metadata the ResultSetMetaData
-     * @param column the column to bind
-     * @return a bound column information
-     * @throws SQLException if a database access error occurs.
+     * @param metadata the result-set metadata from which the column is read
+     * @param column   the one-based index of the column to bind
+     * @return metadata bound from the specified column
+     * @throws SQLException if a database access error occurs
      */
-    public static ResultSetMetaDataColumn bind(final ResultSetMetaData metadata,
-                                               final int column)
-            throws SQLException {
-        return new ResultSetMetaDataColumn()
-                .catalogName(metadata.getCatalogName(column))
-                .columnClassName(metadata.getColumnClassName(column))
-                .columnDisplaySize(metadata.getColumnDisplaySize(column))
-                .columnLabel(metadata.getColumnLabel(column))
-                .columnName(metadata.getColumnName(column))
-                .columnType(metadata.getColumnType(column))
-                .columnTypeName(metadata.getColumnTypeName(column))
-                .precision(metadata.getPrecision(column))
-                .scale(metadata.getScale(column))
-                .schemaName(metadata.getSchemaName(column))
-                .tableName(metadata.getTableName(column))
-                .autoIncrement(metadata.isAutoIncrement(column))
-                .caseSensitive(metadata.isCaseSensitive(column))
-                .currency(metadata.isCurrency(column))
-                .definitelyWritable(metadata.isDefinitelyWritable(column))
-                .nullable(metadata.isNullable(column))
-                .readOnly(metadata.isReadOnly(column))
-                .searchable(metadata.isSearchable(column))
-                .signed(metadata.isSigned(column))
-                .writable(metadata.isWritable(column));
+    public static ResultSetMetaDataColumn bind(final ResultSetMetaData metadata, final int column) throws SQLException {
+        final var instance = new ResultSetMetaDataColumn();
+        instance.setCatalogName(metadata.getCatalogName(column));
+        instance.setColumnClassName(metadata.getColumnClassName(column));
+        instance.setColumnDisplaySize(metadata.getColumnDisplaySize(column));
+        instance.setColumnLabel(metadata.getColumnLabel(column));
+        instance.setColumnName(metadata.getColumnName(column));
+        instance.setColumnType(metadata.getColumnType(column));
+        instance.setColumnTypeName(metadata.getColumnTypeName(column));
+        instance.setPrecision(metadata.getPrecision(column));
+        instance.setScale(metadata.getScale(column));
+        instance.setSchemaName(metadata.getSchemaName(column));
+        instance.setTableName(metadata.getTableName(column));
+        instance.setAutoIncrement(metadata.isAutoIncrement(column));
+        instance.setCaseSensitive(metadata.isCaseSensitive(column));
+        instance.setCurrency(metadata.isCurrency(column));
+        instance.setDefinitelyWritable(metadata.isDefinitelyWritable(column));
+        instance.setNullable(metadata.isNullable(column));
+        instance.setReadOnly(metadata.isReadOnly(column));
+        instance.setSearchable(metadata.isSearchable(column));
+        instance.setSigned(metadata.isSigned(column));
+        instance.setWritable(metadata.isWritable(column));
+        return instance;
     }
 
     /**
-     * Binds all column information from given ResultSetMetaData.
+     * Binds metadata for every column described by the supplied result-set metadata and passes each bound column to the
+     * specified consumer, in column-index order.
      *
-     * @param metadata the ResultSetMetaData
-     * @return a list of bound column formation.
-     * @throws SQLException if a database access error occurs.
+     * @param metadata the result-set metadata from which the columns are read
+     * @param consumer the consumer that accepts each bound column
+     * @throws SQLException if a database access error occurs
      */
-    public static List<ResultSetMetaDataColumn> bind(
-            final ResultSetMetaData metadata)
+    public static void bind(final ResultSetMetaData metadata, final Consumer<? super ResultSetMetaDataColumn> consumer)
             throws SQLException {
-        final int columnCount = metadata.getColumnCount();
-        final List<ResultSetMetaDataColumn> bound
-                = new ArrayList<ResultSetMetaDataColumn>(columnCount);
-        for (int i = 1; i <= columnCount; i++) {
-            bound.add(bind(metadata, i));
+        final var columnCount = metadata.getColumnCount();
+        for (var i = 1; i <= columnCount; i++) {
+            consumer.accept(bind(metadata, i));
         }
+    }
+
+    /**
+     * Binds metadata for every column described by the supplied result-set metadata.
+     *
+     * @param metadata the result-set metadata from which the columns are read
+     * @return the bound column metadata, in column-index order
+     * @throws SQLException if a database access error occurs
+     */
+    public static List<ResultSetMetaDataColumn> bind(final ResultSetMetaData metadata) throws SQLException {
+        final var columnCount = metadata.getColumnCount();
+        final var bound = new ArrayList<ResultSetMetaDataColumn>(columnCount);
+        bind(metadata, bound::add);
         return bound;
     }
 
     /**
-     * Binds all column information from given ResultSet.
+     * Binds metadata for every column in the supplied result set and passes each bound column to the specified
+     * consumer, in column-index order.
      *
-     * @param results the ResultSet
-     * @return a list of bound column information
-     * @throws SQLException if a database access error occurs.
+     * @param results  the result set whose column metadata is bound
+     * @param consumer the consumer that accepts each bound column
+     * @throws SQLException if a database access error occurs
      */
-    public static List<ResultSetMetaDataColumn> bind(final ResultSet results)
+    public static void bind(final ResultSet results, final Consumer<? super ResultSetMetaDataColumn> consumer)
             throws SQLException {
+        bind(results.getMetaData(), consumer);
+    }
+
+    /**
+     * Binds metadata for every column in the supplied result set.
+     *
+     * @param results the result set whose metadata is bound
+     * @return the bound column metadata, in column-index order
+     * @throws SQLException if a database access error occurs
+     */
+    public static List<ResultSetMetaDataColumn> bind(final ResultSet results) throws SQLException {
         return bind(results.getMetaData());
     }
 
-    @Override
-    public String toString() {
-        return super.toString()
-               + "?catalogName=" + catalogName
-               + "&columnClassName=" + columnClassName
-               + "&columnDisplaySize=" + columnDisplaySize
-               + "&columnLabel=" + columnLabel
-               + "&columnName=" + columnName
-               + "&columnType=" + columnType
-               + "&columnTypeName=" + columnTypeName
-               + "&precision=" + precision
-               + "&scale=" + scale
-               + "&schemaName=" + schemaName
-               + "&tableName=" + tableName
-               + "&autoIncrement=" + autoIncrement
-               + "&caseSensigive=" + caseSensitive
-               + "&currency=" + currency
-               + "&definetelyWritable=" + definitelyWritable
-               + "&nullable=" + nullable
-               + "&readOnly=" + readOnly
-               + "&searchable=" + searchable
-               + "&signed=" + signed
-               + "&writable=" + writable;
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates an empty instance for binding frameworks and subclasses.
+     */
+    protected ResultSetMetaDataColumn() {
+        super();
     }
 
-    // ------------------------------------------------------------- catalogName
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+    @Override
+    public String toString() {
+        return super.toString() + '{'
+               + "catalogName=" + catalogName
+               + ",columnClassName=" + columnClassName
+               + ",columnDisplaySize=" + columnDisplaySize
+               + ",columnLabel=" + columnLabel
+               + ",columnName=" + columnName
+               + ",columnType=" + columnType
+               + ",columnTypeName=" + columnTypeName
+               + ",precision=" + precision
+               + ",scale=" + scale
+               + ",schemaName=" + schemaName
+               + ",tableName=" + tableName
+               + ",autoIncrement=" + autoIncrement
+               + ",caseSensitive=" + caseSensitive
+               + ",currency=" + currency
+               + ",definitelyWritable=" + definitelyWritable
+               + ",nullable=" + nullable
+               + ",readOnly=" + readOnly
+               + ",searchable=" + searchable
+               + ",signed=" + signed
+               + ",writable=" + writable
+               + '}';
+    }
+
+    // ----------------------------------------------------------------------------------------------------- catalogName
+
     /**
      * Returns the value of {@code catalogName}.
      *
@@ -133,25 +189,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code catalogName} with given.
+     * Sets the value of {@code catalogName}.
      *
      * @param catalogName new value for {@code catalogName}
      * @see ResultSetMetaData#getCatalogName(int)
      */
-    public void setCatalogName(final String catalogName) {
+    void setCatalogName(final String catalogName) {
         this.catalogName = catalogName;
     }
 
-    public String catalogName() {
-        return getCatalogName();
-    }
+    // ------------------------------------------------------------------------------------------------- columnClassName
 
-    public ResultSetMetaDataColumn catalogName(final String catalogName) {
-        setCatalogName(catalogName);
-        return this;
-    }
-
-    // --------------------------------------------------------- columnClassName
     /**
      * Returns the value of {@code columnClassName}.
      *
@@ -163,26 +211,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnClassName} with given.
+     * Sets the value of {@code columnClassName}.
      *
      * @param columnClassName new value for {@code columnClassName}.
      * @see ResultSetMetaData#getColumnClassName(int)
      */
-    public void setColumnClassName(final String columnClassName) {
+    void setColumnClassName(final String columnClassName) {
         this.columnClassName = columnClassName;
     }
 
-    public String columnClassName() {
-        return getColumnClassName();
-    }
+    // ----------------------------------------------------------------------------------------------- columnDisplaySize
 
-    public ResultSetMetaDataColumn columnClassName(
-            final String columnClassName) {
-        setColumnClassName(columnClassName);
-        return this;
-    }
-
-    // ------------------------------------------------------- columnDisplaySize
     /**
      * Returns the value of {@code columnDisplaySize}.
      *
@@ -194,26 +233,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnDisplaySize} with given.
+     * Sets the value of {@code columnDisplaySize}.
      *
      * @param columnDisplaySize new value for {@code columnDisplaySize}.
      * @see ResultSetMetaData#getColumnDisplaySize(int)
      */
-    public void setColumnDisplaySize(final int columnDisplaySize) {
+    void setColumnDisplaySize(final int columnDisplaySize) {
         this.columnDisplaySize = columnDisplaySize;
     }
 
-    public int columnDisplaySize() {
-        return getColumnDisplaySize();
-    }
+    // ----------------------------------------------------------------------------------------------------- columnLabel
 
-    public ResultSetMetaDataColumn columnDisplaySize(
-            final int columnDisplaySize) {
-        setColumnDisplaySize(columnDisplaySize);
-        return this;
-    }
-
-    // ------------------------------------------------------------- columnLebel
     /**
      * Returns the value of {@code columnLabel}.
      *
@@ -225,25 +255,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnLabel} with given.
+     * Sets the value of {@code columnLabel}.
      *
      * @param columnLabel new value for {@code columnLabel}
      * @see ResultSetMetaData#getColumnLabel(int)
      */
-    public void setColumnLabel(final String columnLabel) {
+    void setColumnLabel(final String columnLabel) {
         this.columnLabel = columnLabel;
     }
 
-    public String columnLabel() {
-        return getColumnLabel();
-    }
+    // ------------------------------------------------------------------------------------------------------ columnName
 
-    public ResultSetMetaDataColumn columnLabel(final String columnLabel) {
-        setColumnLabel(columnLabel);
-        return this;
-    }
-
-    // -------------------------------------------------------------- columnName
     /**
      * Returns the value of {@code columnName}.
      *
@@ -255,25 +277,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnName}.
+     * Sets the value of {@code columnName}.
      *
      * @param columnName the value of {@code columnName}.
      * @see ResultSetMetaData#getColumnName(int)
      */
-    public void setColumnName(final String columnName) {
+    void setColumnName(final String columnName) {
         this.columnName = columnName;
     }
 
-    public String columnName() {
-        return getColumnName();
-    }
+    // ------------------------------------------------------------------------------------------------------ columnType
 
-    public ResultSetMetaDataColumn columnName(final String columnName) {
-        setColumnName(columnName);
-        return this;
-    }
-
-    // -------------------------------------------------------------- columnType
     /**
      * Returns the value of {@code columnType}.
      *
@@ -285,25 +299,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnType}
+     * Sets the value of {@code columnType}.
      *
      * @param columnType new value for {@code columnType}
      * @see ResultSetMetaData#getColumnType(int)
      */
-    public void setColumnType(final int columnType) {
+    void setColumnType(final int columnType) {
         this.columnType = columnType;
     }
 
-    public int columnType() {
-        return getColumnType();
-    }
+    // -------------------------------------------------------------------------------------------------- columnTypeName
 
-    public ResultSetMetaDataColumn columnType(final int columnType) {
-        setColumnType(columnType);
-        return this;
-    }
-
-    // ---------------------------------------------------------- columnTypeName
     /**
      * Returns the value of {@code columnTypeName}.
      *
@@ -315,25 +321,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code columnTypeName}.
+     * Sets the value of {@code columnTypeName}.
      *
      * @param columnTypeName new value for {@code columnTypeName}
      * @see ResultSetMetaData#getColumnTypeName(int)
      */
-    public void setColumnTypeName(final String columnTypeName) {
+    void setColumnTypeName(final String columnTypeName) {
         this.columnTypeName = columnTypeName;
     }
 
-    public String columnTypeName() {
-        return getColumnTypeName();
-    }
+    // ------------------------------------------------------------------------------------------------------- precision
 
-    public ResultSetMetaDataColumn columnTypeName(final String columnTypeName) {
-        setColumnTypeName(columnTypeName);
-        return this;
-    }
-
-    // --------------------------------------------------------------- precision
     /**
      * Returns the value of {@code precision}.
      *
@@ -345,25 +343,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code precision} with given.
+     * Sets the value of {@code precision}.
      *
      * @param precision new value for {@code precision}
      * @see ResultSetMetaData#getPrecision(int)
      */
-    public void setPrecision(final int precision) {
+    void setPrecision(final int precision) {
         this.precision = precision;
     }
 
-    public int precision() {
-        return getPrecision();
-    }
+    // ----------------------------------------------------------------------------------------------------------- scale
 
-    public ResultSetMetaDataColumn precision(final int precision) {
-        setPrecision(precision);
-        return this;
-    }
-
-    // ------------------------------------------------------------------- scale
     /**
      * Returns the value of {@code scale}.
      *
@@ -375,25 +365,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code scale} with given.
+     * Sets the value of {@code scale}.
      *
      * @param scale new value for {@code scale}.
      * @see ResultSetMetaData#getScale(int)
      */
-    public void setScale(final int scale) {
+    void setScale(final int scale) {
         this.scale = scale;
     }
 
-    public int scale() {
-        return getScale();
-    }
+    // ------------------------------------------------------------------------------------------------------ schemaName
 
-    public ResultSetMetaDataColumn scale(final int scale) {
-        setScale(scale);
-        return this;
-    }
-
-    // -------------------------------------------------------------- schemaName
     /**
      * Returns the value of {@code schemaName}.
      *
@@ -405,25 +387,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code schemaName} with given.
+     * Sets the value of {@code schemaName}.
      *
      * @param schemaName new value for {@code schemaName}.
      * @see ResultSetMetaData#getSchemaName(int)
      */
-    public void setSchemaName(final String schemaName) {
+    void setSchemaName(final String schemaName) {
         this.schemaName = schemaName;
     }
 
-    public String schemaName() {
-        return getSchemaName();
-    }
+    // ------------------------------------------------------------------------------------------------------- tableName
 
-    public ResultSetMetaDataColumn schemaName(final String schemaName) {
-        setSchemaName(schemaName);
-        return this;
-    }
-
-    // --------------------------------------------------------------- tableName
     /**
      * Returns the value of {@code tableName}.
      *
@@ -435,25 +409,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code tableName} with given.
+     * Sets the value of {@code tableName}.
      *
      * @param tableName new value for {@code tableName}
      * @see ResultSetMetaData#getTableName(int)
      */
-    public void setTableName(final String tableName) {
+    void setTableName(final String tableName) {
         this.tableName = tableName;
     }
 
-    public String tableName() {
-        return getTableName();
-    }
+    // --------------------------------------------------------------------------------------------------- autoIncrement
 
-    public ResultSetMetaDataColumn tableName(final String tableName) {
-        setTableName(tableName);
-        return this;
-    }
-
-    // ----------------------------------------------------------- autoIncrement
     /**
      * Returns the value of {@code autoIncrement}.
      *
@@ -465,29 +431,21 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code autoIncrement} field with given.
+     * Sets the value of {@code autoIncrement}.
      *
-     * @param autoIncrement new value for {@code autoIncrement} field.
+     * @param autoIncrement the new value of {@code autoIncrement}
      * @see ResultSetMetaData#isAutoIncrement(int)
      */
-    public void setAutoIncrement(final boolean autoIncrement) {
+    void setAutoIncrement(final boolean autoIncrement) {
         this.autoIncrement = autoIncrement;
     }
 
-    public boolean autoIncrement() {
-        return isAutoIncrement();
-    }
+    // --------------------------------------------------------------------------------------------------- caseSensitive
 
-    public ResultSetMetaDataColumn autoIncrement(final boolean autoIncrement) {
-        setAutoIncrement(autoIncrement);
-        return this;
-    }
-
-    // ----------------------------------------------------------- caseSensitive
     /**
-     * Returns the value of {@code caseSensitive} field.
+     * Returns the value of {@code caseSensitive}.
      *
-     * @return the value of {@code caseSensitive} field.
+     * @return the value of {@code caseSensitive}
      * @see ResultSetMetaData#isCaseSensitive(int)
      */
     public boolean isCaseSensitive() {
@@ -495,29 +453,21 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code caseSensitive} field with given.
+     * Sets the value of {@code caseSensitive}.
      *
-     * @param caseSensitive new value for {@code caseSensitive} field.
+     * @param caseSensitive the new value of {@code caseSensitive}
      * @see ResultSetMetaData#isCaseSensitive(int)
      */
-    public void setCaseSensitive(final boolean caseSensitive) {
+    void setCaseSensitive(final boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
     }
 
-    public boolean caseSensitive() {
-        return isCaseSensitive();
-    }
+    // -------------------------------------------------------------------------------------------------------- currency
 
-    public ResultSetMetaDataColumn caseSensitive(final boolean caseSensitive) {
-        setCaseSensitive(caseSensitive);
-        return this;
-    }
-
-    // ---------------------------------------------------------------- currency
     /**
-     * Returns the value of {@code currency} field.
+     * Returns the value of {@code currency}.
      *
-     * @return the value of {@code currency} field.
+     * @return the value of {@code currency}
      * @see ResultSetMetaData#isCurrency(int)
      */
     public boolean isCurrency() {
@@ -525,25 +475,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code currency} field with given.
+     * Sets the value of {@code currency}.
      *
-     * @param currency new value for {@code currency} field.
+     * @param currency the new value of {@code currency}
      * @see ResultSetMetaData#isCurrency(int)
      */
-    public void setCurrency(final boolean currency) {
+    void setCurrency(final boolean currency) {
         this.currency = currency;
     }
 
-    public boolean currency() {
-        return isCurrency();
-    }
+    // ---------------------------------------------------------------------------------------------- definitelyWritable
 
-    public ResultSetMetaDataColumn currency(final boolean currency) {
-        setCurrency(currency);
-        return this;
-    }
-
-    // ------------------------------------------------------ definitelyWritable
     /**
      * Returns the value of {@code definitelyWritable}.
      *
@@ -555,56 +497,39 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code definitelyWritable} with given.
+     * Sets the value of {@code definitelyWritable}.
      *
      * @param definitelyWritable new value for {@code definitelyWritable}.
      * @see ResultSetMetaData#isDefinitelyWritable(int)
      */
-    public void setDefinitelyWritable(final boolean definitelyWritable) {
+    void setDefinitelyWritable(final boolean definitelyWritable) {
         this.definitelyWritable = definitelyWritable;
     }
 
-    public boolean definitelyWritable() {
-        return isDefinitelyWritable();
-    }
+    // -------------------------------------------------------------------------------------------------------- nullable
 
-    public ResultSetMetaDataColumn definitelyWritable(
-            final boolean definitelyWritable) {
-        setDefinitelyWritable(definitelyWritable);
-        return this;
-    }
-
-    // ---------------------------------------------------------------- nullable
     /**
-     * Returns the value of {@code nullable}
+     * Returns the value of {@code nullable}.
      *
      * @return the value of {@code nullable}.
-     * @see ResultSetMetaData#isNullable(int) 
+     * @see ResultSetMetaData#isNullable(int)
      */
     public int getNullable() {
         return nullable;
     }
 
     /**
-     * Replaces the value of {@code nullable} with given.
+     * Sets the value of {@code nullable}.
      *
      * @param nullable new value for {@code nullable}
      * @see ResultSetMetaData#isNullable(int)
      */
-    public void setNullable(final int nullable) {
+    void setNullable(final int nullable) {
         this.nullable = nullable;
     }
 
-    public int nullable() {
-        return getNullable();
-    }
+    // -------------------------------------------------------------------------------------------------------- readOnly
 
-    public ResultSetMetaDataColumn nullable(final int nullable) {
-        setNullable(nullable);
-        return this;
-    }
-
-    // ---------------------------------------------------------------- readOnly
     /**
      * Returns the value of {@code readOnly}.
      *
@@ -616,29 +541,21 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code readOnly}.
+     * Sets the value of {@code readOnly}.
      *
      * @param readOnly new value for {@code readOnly}.
      * @see ResultSetMetaData#isReadOnly(int)
      */
-    public void setReadOnly(final boolean readOnly) {
+    void setReadOnly(final boolean readOnly) {
         this.readOnly = readOnly;
     }
 
-    public boolean readOnly() {
-        return isReadOnly();
-    }
+    // ------------------------------------------------------------------------------------------------------ searchable
 
-    public ResultSetMetaDataColumn readOnly(final boolean readOnly) {
-        setReadOnly(readOnly);
-        return this;
-    }
-
-    // -------------------------------------------------------------- searchable
     /**
-     * Returns the value of {@code searchable} field.
+     * Returns the value of {@code searchable}.
      *
-     * @return the value of {@code searchable} field.
+     * @return the value of {@code searchable}
      * @see ResultSetMetaData#isSearchable(int)
      */
     public boolean isSearchable() {
@@ -646,25 +563,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code searchable} field with given.
+     * Sets the value of {@code searchable}.
      *
-     * @param searchable the value of {@code searchable} field.
+     * @param searchable the new value of {@code searchable}
      * @see ResultSetMetaData#isSearchable(int)
      */
-    public void setSearchable(final boolean searchable) {
+    void setSearchable(final boolean searchable) {
         this.searchable = searchable;
     }
 
-    public boolean searchable() {
-        return isSearchable();
-    }
+    // ---------------------------------------------------------------------------------------------------------- signed
 
-    public ResultSetMetaDataColumn searchable(final boolean searchable) {
-        setSearchable(searchable);
-        return this;
-    }
-
-    // ------------------------------------------------------------------ signed
     /**
      * Returns the value of {@code signed}.
      *
@@ -676,25 +585,17 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code signed} with given.
+     * Sets the value of {@code signed}.
      *
      * @param signed new value for {@code signed}.
      * @see ResultSetMetaData#isSigned(int)
      */
-    public void setSigned(final boolean signed) {
+    void setSigned(final boolean signed) {
         this.signed = signed;
     }
 
-    public boolean signed() {
-        return isSigned();
-    }
+    // -------------------------------------------------------------------------------------------------------- writable
 
-    public ResultSetMetaDataColumn signed(final boolean signed) {
-        setSigned(signed);
-        return this;
-    }
-
-    // ---------------------------------------------------------------- writable
     /**
      * Returns the value of {@code writable}.
      *
@@ -706,25 +607,16 @@ public class ResultSetMetaDataColumn {
     }
 
     /**
-     * Replaces the value of {@code writable} with given.
+     * Sets the value of {@code writable}.
      *
-     * @param writable new value of {@code writable}
+     * @param writable the new value of {@code writable}
      * @see ResultSetMetaData#isWritable(int)
      */
-    public void setWritable(final boolean writable) {
+    void setWritable(final boolean writable) {
         this.writable = writable;
     }
 
-    public boolean writable() {
-        return isWritable();
-    }
-
-    public ResultSetMetaDataColumn writable(final boolean writable) {
-        setWritable(writable);
-        return this;
-    }
-
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
     @XmlElement(required = true)
     private String catalogName;
 

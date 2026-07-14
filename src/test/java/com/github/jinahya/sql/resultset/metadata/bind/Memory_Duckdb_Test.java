@@ -1,6 +1,11 @@
-/*
- * Copyright 2013 <a href="mailto:onacit@gmail.com">Jin Kwon</a>.
- *
+package com.github.jinahya.sql.resultset.metadata.bind;
+
+/*-
+ * #%L
+ * resultset-metadata-bind
+ * %%
+ * Copyright (C) 2016 - 2026 Jinahya, Inc.
+ * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +17,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * #L%
  */
-package com.github.jinahya.sql.resultset.metadata.bind;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import static java.sql.DriverManager.getConnection;
 
 /**
- * Constants for XML binding.
- *
- * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
+ * Tests result-set metadata against an in-memory DuckDB database.
  */
-public final class XmlConstants {
+class Memory_Duckdb_Test
+        extends Memory_$_Test {
+
+    private static final String CONNECTION_URL = "jdbc:duckdb:";
 
     /**
-     * The XML namespace URI for resultset-metadata-bind.
+     * {@inheritDoc}
      */
-    public static final String RESULTSET_METADATA_NS_URI
-            = "http://github.com/jinahya/resultset/metadata/bind";
-
-    static final String RESULTSET_MEATDATA_NS_PREFIX = "r";
-
-    private XmlConstants() {
-        super();
+    @Override
+    Connection connect() throws SQLException {
+        return getConnection(CONNECTION_URL);
     }
 }

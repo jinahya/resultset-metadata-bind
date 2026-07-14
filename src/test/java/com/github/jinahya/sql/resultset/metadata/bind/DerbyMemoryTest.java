@@ -1,6 +1,11 @@
-/*
- * Copyright 2013 <a href="mailto:onacit@gmail.com">Jin Kwon</a>.
- *
+package com.github.jinahya.sql.resultset.metadata.bind;
+
+/*-
+ * #%L
+ * resultset-metadata-bind
+ * %%
+ * Copyright (C) 2016 - 2026 Jinahya, Inc.
+ * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,87 +17,61 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * #L%
  */
-package com.github.jinahya.sql.resultset.metadata.bind;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import java.sql.ResultSet;
-import java.util.List;
-import javax.xml.bind.JAXBException;
-import static org.slf4j.LoggerFactory.getLogger;
+
 import static java.sql.DriverManager.getConnection;
 
 /**
- *
- * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
+ * Tests result-set metadata against an in-memory Apache Derby database.
  */
-public class DerbyMemoryTest {
-
-    private static final Logger logger = getLogger(DerbyMemoryTest.class);
-
-    private static final String DRIVER_NAME
-            = "org.apache.derby.jdbc.EmbeddedDriver";
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class DerbyMemoryTest
+        extends Memory_$_Test {
 
     private static final String CONNECTION_URL = "jdbc:derby:memory:test";
 
-    @BeforeClass
-    private static void beforeClass() throws SQLException {
-        final Properties properties = new Properties();
+    /**
+     * Creates the in-memory database before the inherited tests run.
+     *
+     * @throws SQLException if the database cannot be created
+     */
+    @BeforeAll
+    public void createDatabase() throws SQLException {
+        final var properties = new Properties();
         properties.put("create", "true");
-        try (Connection connection
-                = getConnection(CONNECTION_URL, properties)) {
+        try (var ignored = getConnection(CONNECTION_URL, properties)) {
+            // creates the in-memory database
         }
     }
 
-    @AfterClass
-    private static void afterClass() {
-        final Properties properties = new Properties();
+    /**
+     * Shuts down the in-memory database after the inherited tests finish.
+     */
+    @AfterAll
+    public void shutdownDatabase() {
+        final var properties = new Properties();
         properties.put("shutdown", "true");
-        try {
-            try (Connection connection
-                    = getConnection(CONNECTION_URL, properties)) {
-            }
-        } catch (final SQLException sqle) {
-            // this is expected
-            // Shutdown commands always raise SQLExceptions.
+        try (var ignored = getConnection(CONNECTION_URL, properties)) {
+            // Derby reports successful shutdown by throwing SQLException.
+        } catch (final SQLException expected) {
+            // expected
         }
     }
 
-    @Test
-    public void catalogs() throws SQLException, JAXBException {
-        try (Connection connection = getConnection(CONNECTION_URL)) {
-            final DatabaseMetaData database = connection.getMetaData();
-            try (ResultSet results = database.getCatalogs()) {
-                final List<ResultSetMetaDataColumn> columns
-                        = ResultSetMetaDataColumn.bind(results);
-                for (final ResultSetMetaDataColumn column : columns) {
-                    logger.debug("DatabaseMetaData.catalog: {}", column);
-                    JaxbTest.marshalInstance(column);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void tables() throws SQLException, JAXBException {
-        try (Connection connection = getConnection(CONNECTION_URL)) {
-            final DatabaseMetaData database = connection.getMetaData();
-            try (ResultSet results
-                    = database.getTables(null, null, null, null)) {
-                final List<ResultSetMetaDataColumn> columns
-                        = ResultSetMetaDataColumn.bind(results);
-                for (final ResultSetMetaDataColumn column : columns) {
-                    logger.debug("DatabaseMetaData.table: {}", column);
-                    JaxbTest.marshalInstance(column);
-                }
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    Connection connect() throws SQLException {
+        return getConnection(CONNECTION_URL);
     }
 }
