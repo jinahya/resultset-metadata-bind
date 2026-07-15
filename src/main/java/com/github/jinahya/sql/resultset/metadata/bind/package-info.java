@@ -31,23 +31,16 @@
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 // ------------------------------------------------------------------------------------------------- Jakarta XML Binding
-@XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
         namespace = JakartaXmlBindingConstants.NAMESPACE_URI,
-        elementFormDefault = XmlNsForm.QUALIFIED,
-        attributeFormDefault = XmlNsForm.UNQUALIFIED,
+        elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED,
+        attributeFormDefault = jakarta.xml.bind.annotation.XmlNsForm.UNQUALIFIED,
         xmlns = {
-                @XmlNs(prefix = JakartaXmlBindingConstants.NAMESPACE_PREFIX,
-                       namespaceURI = JakartaXmlBindingConstants.NAMESPACE_URI)
+                @jakarta.xml.bind.annotation.XmlNs(prefix = JakartaXmlBindingConstants.NAMESPACE_PREFIX,
+                                                   namespaceURI = JakartaXmlBindingConstants.NAMESPACE_URI)
         }
 )
-@XmlAccessorType(XmlAccessType.FIELD)
+@jakarta.xml.bind.annotation.XmlAccessorType(jakarta.xml.bind.annotation.XmlAccessType.FIELD)
 // ------------------------------------------------------------------------------------------------ Jakarta JSON Binding
-@JsonbVisibility(JakartaJsonBindingUtils.FieldAccessVisibilityStrategy.class)
+@jakarta.json.bind.annotation.JsonbVisibility(JakartaJsonBindingUtils.FieldAccessVisibilityStrategy.class)
 package com.github.jinahya.sql.resultset.metadata.bind;
-
-import jakarta.json.bind.annotation.JsonbVisibility;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlNs;
-import jakarta.xml.bind.annotation.XmlNsForm;
-import jakarta.xml.bind.annotation.XmlSchema;
