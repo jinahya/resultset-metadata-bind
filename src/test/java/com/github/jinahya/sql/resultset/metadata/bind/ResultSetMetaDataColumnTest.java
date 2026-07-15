@@ -37,14 +37,7 @@ package com.github.jinahya.sql.resultset.metadata.bind;
 
 import org.junit.jupiter.api.Test;
 
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Modifier;
 import java.sql.ResultSetMetaData;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.github.jinahya.sql.resultset.metadata.bind.ResultSetMetaDataColumnAssert.assertThatColumn;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,48 +55,24 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  */
 class ResultSetMetaDataColumnTest {
 
-    private static Map<String, PropertyDescriptor> properties() throws Exception {
-        return Arrays.stream(
-                        Introspector.getBeanInfo(ResultSetMetaDataColumn.class, Object.class).getPropertyDescriptors()
-                )
-                .collect(Collectors.toMap(PropertyDescriptor::getName, Function.identity()));
-    }
-
-    private static Object valueFor(final java.lang.reflect.Method method) {
-        if (method.getReturnType() == String.class) {
-            return method.getName();
-        }
-        if (method.getReturnType() == int.class) {
-            return method.getName().hashCode();
-        }
-        if (method.getReturnType() == boolean.class) {
-            return (method.getName().hashCode() & 1) == 0;
-        }
-        throw new AssertionError("unexpected return type: " + method);
-    }
-
-    private static String propertyName(final java.lang.reflect.Method method) {
-        final var prefixLength = method.getName().startsWith("is") ? 2 : 3;
-        return Introspector.decapitalize(method.getName().substring(prefixLength));
-    }
-
+    /**
+     * Verifies that {@link ResultSetMetaDataColumn} declares a field, an accessor, and a setter of the matching type
+     * for every {@link ResultSetMetaData} binding method.
+     *
+     * @throws Exception if the class cannot be introspected or reflected upon
+     */
     @Test
     void definesPropertyForEachResultSetMetaDataColumnMethod() throws Exception {
-        final var properties = properties();
-        final var methods = Arrays.stream(ResultSetMetaData.class.getMethods())
-                .filter(m -> !Modifier.isStatic(m.getModifiers()))
-                .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{int.class}))
-                .toList();
+        final var properties = ResultSetMetaDataColumnTestUtils.properties();
+        final var methods = ResultSetMetaDataTestUtils.getBindingMethodList();
         assertThat(methods).isNotEmpty();
-
         for (final var metadataMethod : methods) {
             final var prefixLength = metadataMethod.getName().startsWith("is") ? 2 : 3;
-            final var propertyName = Introspector.decapitalize(metadataMethod.getName().substring(prefixLength));
+            final var propertyName = ResultSetMetaDataColumnTestUtils.propertyName(metadataMethod);
             final var field = ResultSetMetaDataColumn.class.getDeclaredField(propertyName);
             assertThat(field.getType())
                     .as("field type for ResultSetMetaData.%s(int)", metadataMethod.getName())
                     .isEqualTo(metadataMethod.getReturnType());
-
             assertThat(properties).as("bean properties")
                     .containsKey(propertyName);
             final var property = properties.get(propertyName);
@@ -113,7 +82,6 @@ class ResultSetMetaDataColumnTest {
             assertThat(property.getReadMethod().getReturnType())
                     .as("accessor return type for property '%s'", propertyName)
                     .isEqualTo(metadataMethod.getReturnType());
-
             final var setterName = "set" + metadataMethod.getName().substring(prefixLength);
             final var setter = ResultSetMetaDataColumn.class.getDeclaredMethod(
                     setterName,
@@ -125,25 +93,29 @@ class ResultSetMetaDataColumnTest {
         }
     }
 
+    /**
+     * Verifies that {@link ResultSetMetaDataColumn#bind(ResultSetMetaData, int)} invokes every
+     * {@link ResultSetMetaData} binding method exactly once for the requested column and assigns each returned value to
+     * the matching property.
+     *
+     * @throws Exception if the class cannot be introspected or reflected upon
+     */
     @Test
     void bindReadsAndAssignsEveryResultSetMetaDataColumnMethod() throws Exception {
         final var column = 7;
-        final var methods = Arrays.stream(ResultSetMetaData.class.getMethods())
-                .filter(m -> !Modifier.isStatic(m.getModifiers()))
-                .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{int.class}))
-                .toList();
+        final var methods = ResultSetMetaDataTestUtils.getBindingMethodList();
         final var metadata = mock(ResultSetMetaData.class, invocation -> {
             if (methods.contains(invocation.getMethod())) {
-                return valueFor(invocation.getMethod());
+                return ResultSetMetaDataTestUtils.valueFor(invocation.getMethod());
             }
             return RETURNS_DEFAULTS.answer(invocation);
         });
 
         final var actual = ResultSetMetaDataColumn.bind(metadata, column);
-        final var properties = properties();
+        final var properties = ResultSetMetaDataColumnTestUtils.properties();
         for (final var method : methods) {
-            final var expected = valueFor(method);
-            final var property = properties.get(propertyName(method));
+            final var expected = ResultSetMetaDataTestUtils.valueFor(method);
+            final var property = properties.get(ResultSetMetaDataColumnTestUtils.propertyName(method));
             assertThat(property.getReadMethod().invoke(actual))
                     .as("value copied from ResultSetMetaData.%s(int)", method.getName())
                     .isEqualTo(expected);
@@ -152,17 +124,23 @@ class ResultSetMetaDataColumnTest {
         verifyNoMoreInteractions(metadata);
     }
 
+    /**
+     * Verifies that a failing {@link ResultSetMetaDataColumnAssert} reports both the expected and actual values.
+     */
     @Test
     void assertionReportsMismatch() {
         final var actual = new ResultSetMetaDataColumn();
         actual.setColumnName("actual");
-
         assertThatThrownBy(() -> assertThatColumn(actual).hasColumnName("expected"))
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("expected")
                 .hasMessageContaining("actual");
     }
 
+    /**
+     * Verifies that {@link ResultSetMetaDataColumnAssert#hasValidNullable()} accepts every {@code nullable} constant
+     * defined by {@link ResultSetMetaData}.
+     */
     @Test
     void hasValidNullableAcceptsAllJdbcConstants() {
         final var actual = new ResultSetMetaDataColumn();
@@ -176,6 +154,10 @@ class ResultSetMetaDataColumnTest {
         }
     }
 
+    /**
+     * Verifies that {@link ResultSetMetaDataColumnAssert#hasValidNullable()} rejects a {@code nullable} value that is
+     * not a {@link ResultSetMetaData} constant.
+     */
     @Test
     void hasValidNullableRejectsUnknownValue() {
         final var actual = new ResultSetMetaDataColumn();

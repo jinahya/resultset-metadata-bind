@@ -55,6 +55,12 @@ public class ResultSetMetaDataColumnWrapper {
      */
     public static final String ROOT_ELEMENT_NAME = "resultSetMetaDataColumns";
 
+    /**
+     * Creates a new wrapper holding the specified elements.
+     *
+     * @param elements the elements to wrap
+     * @return a new wrapper around {@code elements}
+     */
     static ResultSetMetaDataColumnWrapper of(final List<ResultSetMetaDataColumn> elements) {
         final var instance = new ResultSetMetaDataColumnWrapper();
         instance.setElements(elements);
@@ -80,6 +86,11 @@ public class ResultSetMetaDataColumnWrapper {
         return elements;
     }
 
+    /**
+     * Replaces the wrapped elements with the specified list.
+     *
+     * @param elements the elements to wrap; may be {@code null}
+     */
     void setElements(final List<ResultSetMetaDataColumn> elements) {
         this.elements = elements;
     }

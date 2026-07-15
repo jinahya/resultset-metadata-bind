@@ -60,6 +60,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JakartaXmlBindingTest {
 
+    /**
+     * Verifies that a {@link ResultSetMetaDataColumnWrapper} marshals to schema-valid XML and unmarshals back to an
+     * equivalent list of columns.
+     *
+     * @param tempDir a temporary directory for the intermediate XML and schema files
+     * @throws Exception if marshalling, schema generation, validation, or unmarshalling fails
+     */
     @Test
     void wrapperRoundTripsList(@TempDir final Path tempDir) throws Exception {
         final var first = new ResultSetMetaDataColumn();

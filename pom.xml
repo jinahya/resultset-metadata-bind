@@ -106,6 +106,12 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
+    <dependency><!-- provided: used by main code; version managed by jakarta.platform:jakarta.jakartaee-bom -->
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -156,6 +162,13 @@
     <dependency><!-- Jakarta XML Binding implementation (jakarta.xml.bind-api); version managed by jaxb-bom -->
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency><!-- Jakarta Validation implementation (jakarta.validation-api) -->
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
+      <version>9.0.0.Final</version>
       <scope>test</scope>
     </dependency>
     <dependency><!-- Jakarta JSON Binding implementation (jakarta.json.bind-api) -->

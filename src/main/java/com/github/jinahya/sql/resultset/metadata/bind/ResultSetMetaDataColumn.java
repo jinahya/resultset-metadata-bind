@@ -62,28 +62,28 @@ public class ResultSetMetaDataColumn {
      * @throws SQLException if a database access error occurs
      */
     public static ResultSetMetaDataColumn bind(final ResultSetMetaData metadata, final int column) throws SQLException {
-        final var instance = new ResultSetMetaDataColumn();
-        instance.setCatalogName(metadata.getCatalogName(column));
-        instance.setColumnClassName(metadata.getColumnClassName(column));
-        instance.setColumnDisplaySize(metadata.getColumnDisplaySize(column));
-        instance.setColumnLabel(metadata.getColumnLabel(column));
-        instance.setColumnName(metadata.getColumnName(column));
-        instance.setColumnType(metadata.getColumnType(column));
-        instance.setColumnTypeName(metadata.getColumnTypeName(column));
-        instance.setPrecision(metadata.getPrecision(column));
-        instance.setScale(metadata.getScale(column));
-        instance.setSchemaName(metadata.getSchemaName(column));
-        instance.setTableName(metadata.getTableName(column));
-        instance.setAutoIncrement(metadata.isAutoIncrement(column));
-        instance.setCaseSensitive(metadata.isCaseSensitive(column));
-        instance.setCurrency(metadata.isCurrency(column));
-        instance.setDefinitelyWritable(metadata.isDefinitelyWritable(column));
-        instance.setNullable(metadata.isNullable(column));
-        instance.setReadOnly(metadata.isReadOnly(column));
-        instance.setSearchable(metadata.isSearchable(column));
-        instance.setSigned(metadata.isSigned(column));
-        instance.setWritable(metadata.isWritable(column));
-        return instance;
+        final var bound = new ResultSetMetaDataColumn();
+        bound.setCatalogName(metadata.getCatalogName(column));
+        bound.setColumnClassName(metadata.getColumnClassName(column));
+        bound.setColumnDisplaySize(metadata.getColumnDisplaySize(column));
+        bound.setColumnLabel(metadata.getColumnLabel(column));
+        bound.setColumnName(metadata.getColumnName(column));
+        bound.setColumnType(metadata.getColumnType(column));
+        bound.setColumnTypeName(metadata.getColumnTypeName(column));
+        bound.setPrecision(metadata.getPrecision(column));
+        bound.setScale(metadata.getScale(column));
+        bound.setSchemaName(metadata.getSchemaName(column));
+        bound.setTableName(metadata.getTableName(column));
+        bound.setAutoIncrement(metadata.isAutoIncrement(column));
+        bound.setCaseSensitive(metadata.isCaseSensitive(column));
+        bound.setCurrency(metadata.isCurrency(column));
+        bound.setDefinitelyWritable(metadata.isDefinitelyWritable(column));
+        bound.setNullable(metadata.isNullable(column));
+        bound.setReadOnly(metadata.isReadOnly(column));
+        bound.setSearchable(metadata.isSearchable(column));
+        bound.setSigned(metadata.isSigned(column));
+        bound.setWritable(metadata.isWritable(column));
+        return bound;
     }
 
     /**

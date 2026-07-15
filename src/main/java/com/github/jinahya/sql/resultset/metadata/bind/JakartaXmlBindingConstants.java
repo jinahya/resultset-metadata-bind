@@ -50,7 +50,7 @@ public final class JakartaXmlBindingConstants {
     /**
      * The preferred XML namespace prefix used by this package.
      */
-    static final String NAMESPACE_PREFIX = "rmb";
+    static final String NAMESPACE_PREFIX = "rsmdb";
 
     private JakartaXmlBindingConstants() {
         throw new AssertionError("instantiation is not allowed");

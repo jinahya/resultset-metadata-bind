@@ -46,6 +46,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -135,6 +136,26 @@ abstract class Memory_$_Test {
         }
     }
 
+    /**
+     * Binds and marshals column metadata for the result set opened by the specified function against a newly opened
+     * connection. The test is skipped when the driver does not support the metadata method.
+     *
+     * @param function the function opening the result set to test
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    private void bind(final CheckedFunction1<? super DatabaseMetaData, ? extends ResultSet> function) throws Throwable {
+        requireNonNull(function, "function is null");
+        applyConnection(c -> {
+            final var metadata = c.getMetaData();
+            try (var results = function.apply(metadata)) {
+                bind(results);
+            } catch (final SQLFeatureNotSupportedException sqlfnse) {
+                log.debug("unsupported by the driver; {}", sqlfnse.getMessage());
+            }
+            return null;
+        });
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -144,12 +165,7 @@ abstract class Memory_$_Test {
      */
     @Test
     public void getCatalogs__() throws Throwable {
-        applyConnection(c -> {
-            try (var results = c.getMetaData().getCatalogs()) {
-                bind(results);
-            }
-            return null;
-        });
+        bind(DatabaseMetaData::getCatalogs);
     }
 
     /**
@@ -159,12 +175,17 @@ abstract class Memory_$_Test {
      */
     @Test
     public void getSchemas__() throws Throwable {
-        applyConnection(c -> {
-            try (var results = c.getMetaData().getSchemas()) {
-                bind(results);
-            }
-            return null;
-        });
+        bind(DatabaseMetaData::getSchemas);
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getSchemas(String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getSchemas_catalog_schemaPattern() throws Throwable {
+        bind(dmd -> dmd.getSchemas(null, null));
     }
 
     /**
@@ -173,13 +194,149 @@ abstract class Memory_$_Test {
      * @throws Throwable if connecting, reading metadata, or marshalling fails
      */
     @Test
-    public void tables() throws Throwable {
-        applyConnection(connection -> {
-            final var metadata = connection.getMetaData();
-            try (var results = metadata.getTables(null, null, null, null)) {
-                bind(results);
-            }
-            return null;
-        });
+    public void getTables__() throws Throwable {
+        bind(dmd -> dmd.getTables(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getTableTypes()}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getTableTypes__() throws Throwable {
+        bind(DatabaseMetaData::getTableTypes);
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getTypeInfo()}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getTypeInfo__() throws Throwable {
+        bind(DatabaseMetaData::getTypeInfo);
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getColumns(String, String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getColumns__() throws Throwable {
+        bind(dmd -> dmd.getColumns(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getProcedures(String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getProcedures__() throws Throwable {
+        bind(dmd -> dmd.getProcedures(null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by
+     * {@link DatabaseMetaData#getProcedureColumns(String, String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getProcedureColumns__() throws Throwable {
+        bind(dmd -> dmd.getProcedureColumns(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getFunctions(String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getFunctions__() throws Throwable {
+        bind(dmd -> dmd.getFunctions(null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by
+     * {@link DatabaseMetaData#getFunctionColumns(String, String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getFunctionColumns__() throws Throwable {
+        bind(dmd -> dmd.getFunctionColumns(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getTablePrivileges(String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getTablePrivileges__() throws Throwable {
+        bind(dmd -> dmd.getTablePrivileges(null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getUDTs(String, String, String, int[])}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getUDTs__() throws Throwable {
+        bind(dmd -> dmd.getUDTs(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getAttributes(String, String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getAttributes__() throws Throwable {
+        bind(dmd -> dmd.getAttributes(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getSuperTypes(String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getSuperTypes__() throws Throwable {
+        bind(dmd -> dmd.getSuperTypes(null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getSuperTables(String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getSuperTables__() throws Throwable {
+        bind(dmd -> dmd.getSuperTables(null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getPseudoColumns(String, String, String, String)}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getPseudoColumns__() throws Throwable {
+        bind(dmd -> dmd.getPseudoColumns(null, null, null, null));
+    }
+
+    /**
+     * Tests column metadata returned by {@link DatabaseMetaData#getClientInfoProperties()}.
+     *
+     * @throws Throwable if connecting, reading metadata, or marshalling fails
+     */
+    @Test
+    public void getClientInfoProperties__() throws Throwable {
+        bind(DatabaseMetaData::getClientInfoProperties);
     }
 }
