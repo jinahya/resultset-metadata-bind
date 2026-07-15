@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-parent</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.9</version>
   </parent>
 
   <artifactId>resultset-metadata-bind</artifactId>
@@ -43,7 +43,7 @@
     <maven.compiler.testSource>25</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testTarget}</maven.compiler.testRelease>
-    <doclint>none</doclint>
+    <!--    <doclint>none</doclint>-->
     <sonar.organization>jinahya-github</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <version.lombok>1.18.46</version.lombok>
@@ -205,9 +205,26 @@
           <version>3.12.0</version>
           <configuration>
             <additionalOptions>
-              <additionalOption>-Xdoclint:${doclint}</additionalOption>
+              <!--              <additionalOption>-Xdoclint:${doclint}</additionalOption>-->
             </additionalOptions>
             <release>${maven.compiler.release}</release>
+            <tags>
+              <tag>
+                <name>apiNote</name>
+                <placement>a</placement>
+                <head>API Note:</head>
+              </tag>
+              <tag>
+                <name>implSpec</name>
+                <placement>a</placement>
+                <head>Implementation Requirements:</head>
+              </tag>
+              <tag>
+                <name>implNote</name>
+                <placement>a</placement>
+                <head>Implementation Note:</head>
+              </tag>
+            </tags>
           </configuration>
         </plugin>
         <plugin>
@@ -259,6 +276,23 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>tidy-maven-plugin</artifactId>
+        <executions>
+          <execution><!-- unbind the parent's 'check' execution; 'pom' below makes it redundant -->
+            <id>validate</id>
+            <phase>none</phase>
+          </execution>
+          <execution><!-- tidy pom.xml in place on every build -->
+            <id>tidy-pom</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>pom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.15.0</version>
@@ -298,7 +332,7 @@
             </goals>
             <configuration>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
           </execution>
